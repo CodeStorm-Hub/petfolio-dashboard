@@ -181,7 +181,7 @@ export default async function AdminOverviewPage() {
                     </p>
                   </div>
                   <Badge variant="secondary">
-                    {new Date(log.created_at).toLocaleDateString()}
+                    {new Date(log.created_at).toLocaleDateString("en-US")}
                   </Badge>
                 </div>
               ))

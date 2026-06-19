@@ -245,7 +245,7 @@ export function AdminPromosView({ promos }: { promos: Promo[] }) {
                   </TableCell>
                   <TableCell>
                     {promo.valid_until ? (
-                      new Date(promo.valid_until).toLocaleDateString()
+                      new Date(promo.valid_until).toLocaleDateString("en-US")
                     ) : (
                       <Badge variant="secondary">No expiry</Badge>
                     )}

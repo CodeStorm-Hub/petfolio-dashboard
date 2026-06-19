@@ -109,7 +109,7 @@ export function AnnouncementsView({
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground">{announcement.body}</p>
                   <p className="mt-2 text-xs text-muted-foreground">
-                    {new Date(announcement.created_at).toLocaleString()}
+                    {new Date(announcement.created_at).toLocaleString("en-US")}
                   </p>
                 </div>
                 <div className="flex gap-2">

@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/supabase/actions";
+import { NotificationBell } from "@/components/vendor/notification-bell";
 
 const NAV_ITEMS = [
   { href: "/vendor", label: "Overview", icon: LayoutDashboard },
@@ -25,14 +26,23 @@ const NAV_ITEMS = [
   { href: "/vendor/shop", label: "Shop settings", icon: Store },
 ];
 
-export function VendorSidebar({ shopName }: { shopName: string }) {
+export function VendorSidebar({
+  shopName,
+  shopId,
+}: {
+  shopName: string;
+  shopId?: string;
+}) {
   const pathname = usePathname();
 
   return (
     <aside className="flex h-screen w-60 shrink-0 flex-col border-r bg-sidebar">
-      <div className="border-b px-4 py-4">
-        <p className="text-sm text-muted-foreground">Vendor portal</p>
-        <p className="truncate font-semibold">{shopName}</p>
+      <div className="flex items-start justify-between border-b px-4 py-4">
+        <div>
+          <p className="text-sm text-muted-foreground">Vendor portal</p>
+          <p className="truncate font-semibold">{shopName}</p>
+        </div>
+        <NotificationBell shopId={shopId} />
       </div>
       <nav className="flex-1 space-y-1 p-2">
         {NAV_ITEMS.map((item) => {

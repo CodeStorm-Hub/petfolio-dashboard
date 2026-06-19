@@ -236,7 +236,7 @@ export default async function VendorOverviewPage() {
                       {order.id.slice(0, 8)}
                     </TableCell>
                     <TableCell>
-                      {new Date(order.created_at).toLocaleDateString()}
+                      {new Date(order.created_at).toLocaleDateString("en-US")}
                     </TableCell>
                     <TableCell>${(order.amount_cents / 100).toFixed(2)}</TableCell>
                     <TableCell>
