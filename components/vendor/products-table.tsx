@@ -41,6 +41,9 @@ export function ProductsTable({
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [editing, setEditing] = useState<Product | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [pendingBulk, setPendingBulk] = useState<
+    "activate" | "deactivate" | "delete" | null
+  >(null);
 
   const filtered = useMemo(
     () =>
@@ -170,16 +173,57 @@ export function ProductsTable({
 
       {selectedIds.length > 0 ? (
         <div className="flex items-center gap-2 rounded-md border bg-muted/40 p-2 text-sm">
-          <span>{selectedIds.length} selected</span>
-          <Button size="sm" variant="outline" onClick={() => handleBulk("activate")}>
-            Activate
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => handleBulk("deactivate")}>
-            Deactivate
-          </Button>
-          <Button size="sm" variant="destructive" onClick={() => handleBulk("delete")}>
-            Delete
-          </Button>
+          {pendingBulk ? (
+            <>
+              <span className="text-muted-foreground">
+                {pendingBulk === "delete"
+                  ? `Delete ${selectedIds.length} product${selectedIds.length === 1 ? "" : "s"}? This cannot be undone.`
+                  : `${pendingBulk === "activate" ? "Activate" : "Deactivate"} ${selectedIds.length} product${selectedIds.length === 1 ? "" : "s"}?`}
+              </span>
+              <Button
+                size="sm"
+                variant={pendingBulk === "delete" ? "destructive" : "default"}
+                onClick={() => {
+                  handleBulk(pendingBulk);
+                  setPendingBulk(null);
+                }}
+              >
+                Confirm
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPendingBulk(null)}
+              >
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <>
+              <span>{selectedIds.length} selected</span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPendingBulk("activate")}
+              >
+                Activate
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPendingBulk("deactivate")}
+              >
+                Deactivate
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => setPendingBulk("delete")}
+              >
+                Delete
+              </Button>
+            </>
+          )}
         </div>
       ) : null}
 

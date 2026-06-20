@@ -33,10 +33,23 @@ export default async function AdminVendorDetailPage({
   if (!shop) notFound();
 
   const adminClient = createAdminClient();
-  const { data: ownerData } = await adminClient.auth.admin.getUserById(
-    shop.owner_id
-  );
+  const [{ data: ownerData }, tradeLicenseResult, nationalIdResult] =
+    await Promise.all([
+      adminClient.auth.admin.getUserById(shop.owner_id),
+      shop.trade_license_url
+        ? adminClient.storage
+            .from("kyc-documents")
+            .createSignedUrl(shop.trade_license_url, 600)
+        : Promise.resolve({ data: null }),
+      shop.national_id_url
+        ? adminClient.storage
+            .from("kyc-documents")
+            .createSignedUrl(shop.national_id_url, 600)
+        : Promise.resolve({ data: null }),
+    ]);
   const ownerEmail = ownerData.user?.email ?? shop.owner_id;
+  const tradeLicenseSignedUrl = tradeLicenseResult.data?.signedUrl ?? null;
+  const nationalIdSignedUrl = nationalIdResult.data?.signedUrl ?? null;
 
   const [{ data: orders }, { data: ledgers }] = await Promise.all([
     supabase
@@ -132,11 +145,11 @@ export default async function AdminVendorDetailPage({
               <p>{shop.description}</p>
             </div>
           ) : null}
-          {shop.trade_license_url ? (
+          {tradeLicenseSignedUrl ? (
             <div>
               <p className="text-muted-foreground">Trade license</p>
               <a
-                href={shop.trade_license_url}
+                href={tradeLicenseSignedUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="text-primary underline-offset-4 hover:underline"
@@ -145,11 +158,11 @@ export default async function AdminVendorDetailPage({
               </a>
             </div>
           ) : null}
-          {shop.national_id_url ? (
+          {nationalIdSignedUrl ? (
             <div>
               <p className="text-muted-foreground">National ID</p>
               <a
-                href={shop.national_id_url}
+                href={nationalIdSignedUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="text-primary underline-offset-4 hover:underline"

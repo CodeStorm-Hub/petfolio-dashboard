@@ -25,19 +25,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProductImagesField } from "@/components/vendor/product-images-field";
+import { PRODUCT_CATEGORIES } from "@/lib/constants/categories";
 
 type Product = Database["public"]["Tables"]["products"]["Row"];
-
-const CATEGORIES = [
-  "food",
-  "gear",
-  "toys",
-  "treats",
-  "health",
-  "grooming",
-  "beds",
-  "apparel",
-];
 
 export function ProductFormDrawer({
   shopId,
@@ -55,7 +45,7 @@ export function ProductFormDrawer({
     name: product?.name ?? "",
     brand: product?.brand ?? "",
     sku: product?.sku ?? "",
-    category: product?.category ?? CATEGORIES[0],
+    category: product?.category ?? PRODUCT_CATEGORIES[0].value,
     description: product?.description ?? "",
     tags: (product?.tags ?? []).join(", "),
     price: product ? (product.price_cents / 100).toString() : "",
@@ -161,15 +151,15 @@ export function ProductFormDrawer({
               <Label>Category</Label>
               <Select
                 value={form.category}
-                onValueChange={(value) => set("category", value ?? CATEGORIES[0])}
+                onValueChange={(value) => set("category", value ?? PRODUCT_CATEGORIES[0].value)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
+                  {PRODUCT_CATEGORIES.map((cat) => (
+                    <SelectItem key={cat.value} value={cat.value}>
+                      {cat.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
