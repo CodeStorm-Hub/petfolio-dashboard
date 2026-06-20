@@ -65,7 +65,7 @@ export async function addShipment(
     tracking_url: input.tracking_url || null,
     estimated_delivery_at: input.estimated_delivery_at || null,
     delivery_notes: input.delivery_notes || null,
-    status: "shipped",
+    status: "in_transit",
     shipped_at: new Date().toISOString(),
   });
 

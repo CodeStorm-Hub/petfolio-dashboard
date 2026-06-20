@@ -30,6 +30,7 @@ export default async function VendorOrderDetailPage({
     { data: shipment },
     { data: prescriptions },
     { data: buyerProfile },
+    { data: buyerAddresses },
   ] = await Promise.all([
     supabase.from("shipments").select("*").eq("order_id", order.id).maybeSingle(),
     supabase.from("prescriptions").select("*").eq("order_id", order.id),
@@ -38,6 +39,11 @@ export default async function VendorOrderDetailPage({
       .select("id, display_name, username, avatar_url, location")
       .eq("id", order.buyer_id)
       .maybeSingle(),
+    supabase
+      .from("user_addresses")
+      .select("label, full_address, city, zone, area, is_default")
+      .eq("user_id", order.buyer_id)
+      .order("is_default", { ascending: false }),
   ]);
 
   const prescriptionImageUrls: Record<string, string> = {};
@@ -71,6 +77,7 @@ export default async function VendorOrderDetailPage({
       prescriptionImageUrls={prescriptionImageUrls}
       shopName={shop.shop_name}
       buyer={buyer}
+      buyerAddresses={buyerAddresses ?? []}
     />
   );
 }

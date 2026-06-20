@@ -48,6 +48,15 @@ type BuyerUser = {
   email?: string | null;
 };
 
+type BuyerAddress = {
+  label: string;
+  full_address: string;
+  city: string;
+  zone: string;
+  area: string;
+  is_default: boolean;
+};
+
 type LineItem = {
   product_id?: string;
   name?: string;
@@ -156,6 +165,7 @@ export function OrderDetail({
   prescriptionImageUrls,
   shopName,
   buyer,
+  buyerAddresses,
 }: {
   order: Order;
   shipment: Shipment | null;
@@ -163,6 +173,7 @@ export function OrderDetail({
   prescriptionImageUrls: Record<string, string>;
   shopName: string;
   buyer: BuyerUser | null;
+  buyerAddresses: BuyerAddress[];
 }) {
   const router = useRouter();
   const [courier, setCourier] = useState("");
@@ -543,11 +554,27 @@ export function OrderDetail({
               Shipping Address
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-sm">
-            {addressText ? (
-              <p className="whitespace-pre-line text-muted-foreground">
-                {addressText}
-              </p>
+          <CardContent className="space-y-3 text-sm">
+            {buyerAddresses.length > 0 ? (
+              buyerAddresses.map((addr, i) => (
+                <div
+                  key={i}
+                  className={`rounded-md border p-3 space-y-0.5 ${addr.is_default ? "border-primary/40 bg-primary/5" : ""}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium capitalize">{addr.label}</span>
+                    {addr.is_default ? (
+                      <Badge variant="secondary" className="text-xs">Default</Badge>
+                    ) : null}
+                  </div>
+                  <p className="text-muted-foreground">{addr.full_address}</p>
+                  <p className="text-muted-foreground">
+                    {[addr.area, addr.zone, addr.city].filter(Boolean).join(", ")}
+                  </p>
+                </div>
+              ))
+            ) : addressText ? (
+              <p className="whitespace-pre-line text-muted-foreground">{addressText}</p>
             ) : (
               <p className="text-muted-foreground">No address on file.</p>
             )}
