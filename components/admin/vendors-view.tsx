@@ -50,9 +50,11 @@ const KYC_VARIANT: Record<string, "secondary" | "destructive" | "default"> = {
 export function VendorsView({
   shops,
   ownerEmails,
+  kycFileUrls,
 }: {
   shops: Shop[];
   ownerEmails: Record<string, string>;
+  kycFileUrls: Record<string, string>;
 }) {
   const router = useRouter();
   const [rejectTarget, setRejectTarget] = useState<Shop | null>(null);
@@ -146,9 +148,9 @@ export function VendorsView({
                       {ownerEmails[shop.owner_id] ?? shop.owner_id}
                     </p>
                     <div className="mt-2 flex gap-3 text-sm">
-                      {shop.trade_license_url ? (
+                      {kycFileUrls[`${shop.id}:trade_license`] ? (
                         <a
-                          href={shop.trade_license_url}
+                          href={kycFileUrls[`${shop.id}:trade_license`]}
                           target="_blank"
                           rel="noreferrer"
                           className="text-primary underline-offset-4 hover:underline"
@@ -156,9 +158,9 @@ export function VendorsView({
                           Trade license
                         </a>
                       ) : null}
-                      {shop.national_id_url ? (
+                      {kycFileUrls[`${shop.id}:national_id`] ? (
                         <a
-                          href={shop.national_id_url}
+                          href={kycFileUrls[`${shop.id}:national_id`]}
                           target="_blank"
                           rel="noreferrer"
                           className="text-primary underline-offset-4 hover:underline"
