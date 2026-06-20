@@ -48,7 +48,13 @@ export async function cancelOrder(orderId: string, reason: string) {
 
 export async function addShipment(
   orderId: string,
-  input: { courier: string; tracking_id: string; tracking_url?: string }
+  input: {
+    courier: string;
+    tracking_id: string;
+    tracking_url?: string;
+    estimated_delivery_at?: string;
+    delivery_notes?: string;
+  }
 ) {
   const supabase = await createClient();
 
@@ -57,6 +63,8 @@ export async function addShipment(
     courier: input.courier,
     tracking_id: input.tracking_id,
     tracking_url: input.tracking_url || null,
+    estimated_delivery_at: input.estimated_delivery_at || null,
+    delivery_notes: input.delivery_notes || null,
     status: "shipped",
     shipped_at: new Date().toISOString(),
   });
@@ -75,6 +83,26 @@ export async function addShipment(
     .eq("id", orderId);
 
   if (orderError) return { error: orderError.message };
+
+  revalidatePath("/vendor/orders");
+  revalidatePath(`/vendor/orders/${orderId}`);
+  return { error: null };
+}
+
+export async function markDelivered(orderId: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("marketplace_orders")
+    .update({ status: "delivered" })
+    .eq("id", orderId);
+
+  if (error) return { error: error.message };
+
+  await supabase
+    .from("shipments")
+    .update({ status: "delivered" })
+    .eq("order_id", orderId);
 
   revalidatePath("/vendor/orders");
   revalidatePath(`/vendor/orders/${orderId}`);

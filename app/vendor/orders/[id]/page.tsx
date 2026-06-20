@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { getCurrentVendorShop } from "@/lib/vendor/get-shop";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { OrderDetail } from "@/components/vendor/order-detail";
 
 export const dynamic = "force-dynamic";
@@ -25,13 +26,18 @@ export default async function VendorOrderDetailPage({
 
   if (!order) notFound();
 
-  const [{ data: shipment }, { data: prescriptions }] = await Promise.all([
-    supabase
-      .from("shipments")
-      .select("*")
-      .eq("order_id", order.id)
-      .maybeSingle(),
+  const [
+    { data: shipment },
+    { data: prescriptions },
+    { data: buyerProfile },
+  ] = await Promise.all([
+    supabase.from("shipments").select("*").eq("order_id", order.id).maybeSingle(),
     supabase.from("prescriptions").select("*").eq("order_id", order.id),
+    supabase
+      .from("users")
+      .select("id, display_name, username, avatar_url, location")
+      .eq("id", order.buyer_id)
+      .maybeSingle(),
   ]);
 
   const prescriptionImageUrls: Record<string, string> = {};
@@ -44,6 +50,19 @@ export default async function VendorOrderDetailPage({
     }
   }
 
+  let buyerEmail: string | null = null;
+  try {
+    const admin = createAdminClient();
+    const {
+      data: { user: authUser },
+    } = await admin.auth.admin.getUserById(order.buyer_id);
+    buyerEmail = authUser?.email ?? null;
+  } catch {
+    // non-critical
+  }
+
+  const buyer = buyerProfile ? { ...buyerProfile, email: buyerEmail } : null;
+
   return (
     <OrderDetail
       order={order}
@@ -51,6 +70,7 @@ export default async function VendorOrderDetailPage({
       prescriptions={prescriptions ?? []}
       prescriptionImageUrls={prescriptionImageUrls}
       shopName={shop.shop_name}
+      buyer={buyer}
     />
   );
 }
