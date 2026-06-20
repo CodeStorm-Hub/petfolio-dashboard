@@ -21,16 +21,38 @@ export default async function AdminOrderDetailPage({
 
   if (!order) notFound();
 
-  const [{ data: shop }, { data: shipment }] = await Promise.all([
-    supabase.from("shops").select("shop_name").eq("id", order.shop_id).maybeSingle(),
-    supabase.from("shipments").select("*").eq("order_id", order.id).maybeSingle(),
-  ]);
+  const [{ data: shop }, { data: shipment }, { data: prescriptions }] =
+    await Promise.all([
+      supabase
+        .from("shops")
+        .select("shop_name")
+        .eq("id", order.shop_id)
+        .maybeSingle(),
+      supabase
+        .from("shipments")
+        .select("*")
+        .eq("order_id", order.id)
+        .maybeSingle(),
+      supabase.from("prescriptions").select("*").eq("order_id", order.id),
+    ]);
+
+  const prescriptionImageUrls: Record<string, string> = {};
+  for (const rx of prescriptions ?? []) {
+    if (rx.file_path) {
+      const { data } = await supabase.storage
+        .from("prescriptions")
+        .createSignedUrl(rx.file_path, 3600);
+      if (data?.signedUrl) prescriptionImageUrls[rx.id] = data.signedUrl;
+    }
+  }
 
   return (
     <AdminOrderDetail
       order={order}
       shopName={shop?.shop_name ?? "Unknown"}
       shipment={shipment ?? null}
+      prescriptions={prescriptions ?? []}
+      prescriptionImageUrls={prescriptionImageUrls}
     />
   );
 }

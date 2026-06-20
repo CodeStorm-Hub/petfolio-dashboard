@@ -219,6 +219,7 @@ export function ProductsTable({
       </div>
 
       <ProductFormDrawer
+        key={editing?.id ?? "new"}
         shopId={shopId}
         product={editing}
         open={drawerOpen}

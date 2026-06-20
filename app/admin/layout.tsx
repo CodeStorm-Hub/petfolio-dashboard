@@ -16,7 +16,7 @@ export default async function AdminLayout({
   if (!user) redirect("/login");
 
   return (
-    <div className="flex">
+    <div className="flex h-screen overflow-hidden">
       <AdminSidebar email={user.email ?? ""} />
       <main className="flex-1 overflow-y-auto p-6">{children}</main>
     </div>

@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { EarningsBarChart } from "@/components/vendor/earnings-bar-chart";
 import {
   Select,
   SelectContent,
@@ -71,6 +72,24 @@ export function EarningsView({
       pendingClearance: sum("pending_clearance"),
       totalPaid: sum("paid"),
     };
+  }, [ledgers]);
+
+  const monthlyChartData = useMemo(() => {
+    const byMonth = new Map<string, number>();
+    for (const ledger of ledgers) {
+      const month = ledger.created_at.slice(0, 7); // "YYYY-MM"
+      byMonth.set(month, (byMonth.get(month) ?? 0) + ledger.vendor_earnings_cents);
+    }
+    return Array.from(byMonth.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .slice(-12)
+      .map(([month, cents]) => ({
+        month: new Date(`${month}-01`).toLocaleDateString("en-US", {
+          month: "short",
+          year: "2-digit",
+        }),
+        earnings: cents / 100,
+      }));
   }, [ledgers]);
 
   async function handleRequestPayout(event: React.FormEvent) {
@@ -137,6 +156,17 @@ export function EarningsView({
           </CardContent>
         </Card>
       </div>
+
+      {monthlyChartData.length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Monthly earnings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EarningsBarChart data={monthlyChartData} />
+          </CardContent>
+        </Card>
+      ) : null}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger render={<Button>Request payout</Button>} />

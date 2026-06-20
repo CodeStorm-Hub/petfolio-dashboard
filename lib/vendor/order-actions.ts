@@ -27,6 +27,25 @@ export async function updateOrderStatus(orderId: string, status: string) {
   return { error: null };
 }
 
+export async function cancelOrder(orderId: string, reason: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("marketplace_orders")
+    .update({
+      status: "cancelled",
+      cancelled_reason: reason,
+      cancelled_at: new Date().toISOString(),
+    })
+    .eq("id", orderId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/vendor/orders");
+  revalidatePath(`/vendor/orders/${orderId}`);
+  return { error: null };
+}
+
 export async function addShipment(
   orderId: string,
   input: { courier: string; tracking_id: string; tracking_url?: string }

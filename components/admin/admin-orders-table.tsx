@@ -2,9 +2,11 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { Download } from "lucide-react";
 
 import type { Database } from "@/lib/types/database";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Tabs,
@@ -34,6 +36,44 @@ export function AdminOrdersTable({
 }) {
   const [search, setSearch] = useState("");
 
+  function exportCsv(rows: Order[]) {
+    const header = [
+      "order_id",
+      "shop",
+      "date",
+      "amount",
+      "payment_method",
+      "payment_status",
+      "status",
+      "refund_status",
+    ];
+    const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
+    const csvRows = rows.map((o) =>
+      [
+        o.id,
+        shopNames[o.shop_id] ?? "",
+        new Date(o.created_at).toISOString(),
+        (o.amount_cents / 100).toFixed(2),
+        o.payment_method,
+        o.payment_status,
+        o.status,
+        o.refund_status ?? "none",
+      ]
+        .map(String)
+        .map(escape)
+        .join(",")
+    );
+    const blob = new Blob([[header.join(","), ...csvRows].join("\n")], {
+      type: "text/csv",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `orders-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const filtered = useMemo(
     () =>
       orders.filter((order) =>
@@ -46,12 +86,23 @@ export function AdminOrdersTable({
 
   return (
     <div className="space-y-4">
-      <Input
-        placeholder="Search by order ID, title, or shop..."
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        className="max-w-sm"
-      />
+      <div className="flex items-center gap-3">
+        <Input
+          placeholder="Search by order ID, title, or shop..."
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="max-w-sm"
+        />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => exportCsv(filtered)}
+          className="ml-auto shrink-0"
+        >
+          <Download className="size-4" />
+          Export CSV
+        </Button>
+      </div>
 
       <Tabs defaultValue="all">
         <TabsList>

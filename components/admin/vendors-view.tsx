@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -206,6 +207,7 @@ export function VendorsView({
                   <TableHead>Active</TableHead>
                   <TableHead>Featured</TableHead>
                   <TableHead>Created</TableHead>
+                  <TableHead />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -245,11 +247,19 @@ export function VendorsView({
                       <TableCell>
                         {new Date(shop.created_at).toLocaleDateString()}
                       </TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/admin/vendors/${shop.id}`}
+                          className="text-sm text-primary underline-offset-4 hover:underline"
+                        >
+                          View
+                        </Link>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
+                    <TableCell colSpan={8} className="h-24 text-center">
                       No vendors yet.
                     </TableCell>
                   </TableRow>

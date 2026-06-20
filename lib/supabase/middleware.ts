@@ -54,6 +54,17 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
+    if (isVendorRoute && !appMetadata.is_vendor && !appMetadata.is_admin) {
+      // Allow /vendor and /vendor/shop so new users can submit KYC
+      const isSetupRoute =
+        pathname === "/vendor" || pathname.startsWith("/vendor/shop");
+      if (!isSetupRoute) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/unauthorized";
+        return NextResponse.redirect(url);
+      }
+    }
+
     if (isAuthRoute || isRoot) {
       const url = request.nextUrl.clone();
       url.pathname = appMetadata.is_admin ? "/admin" : "/vendor";

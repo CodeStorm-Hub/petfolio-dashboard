@@ -17,7 +17,7 @@ export default async function VendorLayout({
   }
 
   return (
-    <div className="flex">
+    <div className="flex h-screen overflow-hidden">
       <VendorSidebar shopName={shop?.shop_name ?? "New shop"} shopId={shop?.id} />
       <main className="flex-1 overflow-y-auto p-6">{children}</main>
     </div>

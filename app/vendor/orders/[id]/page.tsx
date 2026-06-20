@@ -34,11 +34,23 @@ export default async function VendorOrderDetailPage({
     supabase.from("prescriptions").select("*").eq("order_id", order.id),
   ]);
 
+  const prescriptionImageUrls: Record<string, string> = {};
+  for (const rx of prescriptions ?? []) {
+    if (rx.file_path) {
+      const { data } = await supabase.storage
+        .from("prescriptions")
+        .createSignedUrl(rx.file_path, 3600);
+      if (data?.signedUrl) prescriptionImageUrls[rx.id] = data.signedUrl;
+    }
+  }
+
   return (
     <OrderDetail
       order={order}
       shipment={shipment ?? null}
       prescriptions={prescriptions ?? []}
+      prescriptionImageUrls={prescriptionImageUrls}
+      shopName={shop.shop_name}
     />
   );
 }
