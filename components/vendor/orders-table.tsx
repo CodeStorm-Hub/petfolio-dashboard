@@ -117,7 +117,7 @@ export function OrdersTable({ orders }: { orders: Order[] }) {
                             <TableCell className="font-mono text-xs">
                               {order.id.slice(0, 8)}
                             </TableCell>
-                            <TableCell>
+                            <TableCell suppressHydrationWarning>
                               {new Date(order.created_at).toLocaleDateString()}
                             </TableCell>
                             <TableCell>{lineItems}</TableCell>

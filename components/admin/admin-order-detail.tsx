@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ArrowLeft, ExternalLink } from "lucide-react";
+import Image from "next/image";
 
 import type { Database } from "@/lib/types/database";
 import {
@@ -260,9 +261,12 @@ export function AdminOrderDetail({
                     rel="noreferrer"
                     className="shrink-0"
                   >
-                    <img
+                    <Image
                       src={prescriptionImageUrls[rx.id]}
                       alt="Prescription"
+                      width={64}
+                      height={64}
+                      unoptimized
                       className="h-16 w-16 rounded border object-cover"
                     />
                   </a>

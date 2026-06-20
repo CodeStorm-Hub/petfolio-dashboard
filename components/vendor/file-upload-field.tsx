@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Loader2, Upload, X } from "lucide-react";
+import Image from "next/image";
 
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -65,9 +66,12 @@ export function FileUploadField({
       <div className="flex items-center gap-3">
         {display ? (
           <div className="relative">
-            <img
+            <Image
               src={display}
               alt={label}
+              width={64}
+              height={64}
+              unoptimized
               className="size-16 rounded-md border object-cover"
             />
             <button

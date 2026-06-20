@@ -19,6 +19,7 @@ import {
   Hash,
   Mail,
 } from "lucide-react";
+import Image from "next/image";
 
 import type { Database } from "@/lib/types/database";
 import {
@@ -389,9 +390,12 @@ export function OrderDetail({
               <>
                 <div className="flex items-center gap-3">
                   {buyer.avatar_url ? (
-                    <img
+                    <Image
                       src={buyer.avatar_url}
                       alt={buyer.display_name}
+                      width={40}
+                      height={40}
+                      unoptimized
                       className="size-10 rounded-full object-cover ring-1 ring-border"
                     />
                   ) : (
@@ -829,9 +833,12 @@ export function OrderDetail({
                       rel="noreferrer"
                       className="shrink-0"
                     >
-                      <img
+                      <Image
                         src={prescriptionImageUrls[rx.id]}
                         alt="Prescription"
+                        width={64}
+                        height={64}
+                        unoptimized
                         className="h-16 w-16 rounded border object-cover"
                       />
                     </a>

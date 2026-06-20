@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Loader2, Upload, X } from "lucide-react";
+import Image from "next/image";
 
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -49,7 +50,7 @@ export function ProductImagesField({
       <div className="flex flex-wrap gap-2">
         {value.map((url) => (
           <div key={url} className="relative">
-            <img src={url} alt="" className="size-16 rounded-md border object-cover" />
+            <Image src={url} alt="" width={64} height={64} unoptimized className="size-16 rounded-md border object-cover" />
             <button
               type="button"
               onClick={() => onChange(value.filter((u) => u !== url))}
