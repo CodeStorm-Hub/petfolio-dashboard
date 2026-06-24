@@ -13,6 +13,8 @@ import {
   Settings,
   Megaphone,
   LogOut,
+  Banknote,
+  Trash2,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -23,8 +25,10 @@ const NAV_ITEMS = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/vendors", label: "Vendors", icon: Store },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/admin/cod", label: "COD Reconciliation", icon: Banknote },
   { href: "/admin/prescriptions", label: "Prescriptions", icon: FileText },
   { href: "/admin/payouts", label: "Payouts", icon: Wallet },
+  { href: "/admin/shop-deletions", label: "Shop Deletions", icon: Trash2 },
   { href: "/admin/disputes", label: "Disputes", icon: Gavel },
   { href: "/admin/promos", label: "Promos", icon: Tag },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Loader2, Upload, X } from "lucide-react";
 import Image from "next/image";
+import { toast } from "sonner";
 
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -23,21 +24,39 @@ export function ProductImagesField({
   async function handleFiles(files: FileList) {
     setUploading(true);
     const supabase = createClient();
+
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData.user) {
+      toast.error("You must be signed in to upload images");
+      setUploading(false);
+      return;
+    }
+
     const uploaded: string[] = [];
+    let failures = 0;
 
     for (const file of Array.from(files)) {
       const ext = file.name.split(".").pop();
-      const path = `${shopId}/${crypto.randomUUID()}.${ext}`;
+      // First path segment must be the uploader's auth.uid() — required by the
+      // "marketplace-images" storage RLS policies, which check it, not shopId.
+      const path = `${userData.user.id}/${shopId}/${crypto.randomUUID()}.${ext}`;
       const { error } = await supabase.storage
         .from("marketplace-images")
         .upload(path, file);
 
-      if (!error) {
-        const { data } = supabase.storage
-          .from("marketplace-images")
-          .getPublicUrl(path);
-        uploaded.push(data.publicUrl);
+      if (error) {
+        failures += 1;
+        continue;
       }
+
+      const { data } = supabase.storage
+        .from("marketplace-images")
+        .getPublicUrl(path);
+      uploaded.push(data.publicUrl);
+    }
+
+    if (failures > 0) {
+      toast.error(`${failures} image${failures > 1 ? "s" : ""} failed to upload`);
     }
 
     onChange([...value, ...uploaded]);
